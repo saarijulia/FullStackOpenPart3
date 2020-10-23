@@ -1,3 +1,4 @@
+const { request } = require('express')
 const express = require('express')
 const app = express()
 const morgan = require('morgan')
@@ -45,7 +46,7 @@ app.get('/api/persons/:id', (request, response) => {
     } else {
         response.status(404).end()
     }
-    
+
 })
 
 app.get('/info', (request, response) => {
@@ -62,15 +63,11 @@ app.delete('/api/persons/:id', (request, response) => {
 })
 
 app.post('/api/persons', (request, response) => {
-
     const body = request.body
-    console.log(request.body);
-    console.log('included:',phonenumbers.some(person => person.name == body.name));
-    
 
     const generateId = () => {
         const maxId = phonenumbers.length > 0
-            ? Math.max(...phonenumbers.map( n => n.id))
+            ? Math.max(...phonenumbers.map(n => n.id))
             : 0
         return maxId + 1
     }
