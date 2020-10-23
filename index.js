@@ -48,6 +48,15 @@ app.get('/info', (request, response) => {
     const numCount = phonenumbers.length
     response.send(`<p>Phonebook has info for ${numCount} people</p> <br/> ${Date()}`)
 })
+
+app.delete('/api/persons/:id', (request, response) => {
+    const id = Number(request.params.id)
+    console.log('Deleting person', phonenumbers.find(person => person.id === id));
+    phonenumbers = phonenumbers.filter(person => person.id !== id)
+
+    response.status(204).end()
+})
+
 const PORT = 3001
 app.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`);
