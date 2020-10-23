@@ -1,6 +1,8 @@
 const express = require('express')
 const app = express()
 
+app.use(express.json())
+
 let phonenumbers = [
     {
         id: 1,
@@ -55,6 +57,29 @@ app.delete('/api/persons/:id', (request, response) => {
     phonenumbers = phonenumbers.filter(person => person.id !== id)
 
     response.status(204).end()
+})
+
+app.post('/api/persons', (request, response) => {
+
+    const body = request.body
+    console.log(request.body);
+
+    const generateId = () => {
+        const maxId = phonenumbers.length > 0
+            ? Math.max(...phonenumbers.map( n => n.id))
+            : 0
+        return maxId + 1
+    }
+
+    const person = {
+        id: generateId(),
+        name: body.name,
+        number: body.number
+    }
+    console.log(person);
+    phonenumbers = phonenumbers.concat(person)
+    response.json(person)
+
 })
 
 const PORT = 3001
