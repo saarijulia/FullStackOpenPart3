@@ -63,6 +63,8 @@ app.post('/api/persons', (request, response) => {
 
     const body = request.body
     console.log(request.body);
+    console.log('included:',phonenumbers.some(person => person.name == body.name));
+    
 
     const generateId = () => {
         const maxId = phonenumbers.length > 0
@@ -71,14 +73,26 @@ app.post('/api/persons', (request, response) => {
         return maxId + 1
     }
 
-    const person = {
-        id: generateId(),
-        name: body.name,
-        number: body.number
+    if (!body.name || !body.number) {
+        return response.status(400).json({
+            error: 'content missing'
+        })
+    } else if (phonenumbers.some(person => person.name == body.name)) {
+        return response.status(400).json({
+            error: 'person already exists in phonebook'
+        })
+    } else {
+
+        const person = {
+            id: generateId(),
+            name: body.name,
+            number: body.number
+        }
+        console.log(person);
+        phonenumbers = phonenumbers.concat(person)
+        response.json(person)
     }
-    console.log(person);
-    phonenumbers = phonenumbers.concat(person)
-    response.json(person)
+
 
 })
 
