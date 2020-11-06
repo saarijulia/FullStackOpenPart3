@@ -51,14 +51,15 @@ app.get('/api/persons', (request, response) => {
 })
 
 app.get('/api/persons/:id', (request, response) => {
-    const id = Number(request.params.id)
-    const person = phonenumbers.find(person => person.id === id)
-
-    if (person) {
-        response.json(person)
-    } else {
-        response.status(404).end()
-    }
+    const id = Phonenumber.findById(request.params.id)
+        .then(number => {
+            if (number) {
+                response.json(number)
+            } else {
+                response.status(404).end
+            }
+        })
+        .catch(error => next(error))
 
 })
 
@@ -68,22 +69,23 @@ app.get('/info', (request, response) => {
 })
 
 app.delete('/api/persons/:id', (request, response) => {
-    const id = Number(request.params.id)
-    console.log('Deleting person', phonenumbers.find(person => person.id === id));
-    phonenumbers = phonenumbers.filter(person => person.id !== id)
-
-    response.status(204).end()
+    Phonenumber.findByIdAndRemove(request.params.id)
+        .then(result => {
+            console.log('deleted', request.params.id);
+            response.status(204).end()
+        })
+        .catch(error => next(error))
 })
 
 app.post('/api/persons', (request, response) => {
     const body = request.body
 
-    /*const generateId = () => {
+    const generateId = () => {
         const maxId = phonenumbers.length > 0
             ? Math.max(...phonenumbers.map(n => n.id))
             : 0
         return maxId + 1
-    }*/
+    }
 
     if (!body.name || !body.number) {
         return response.status(400).json({
@@ -96,7 +98,8 @@ app.post('/api/persons', (request, response) => {
     } else {
         const phonenumber = new Phonenumber({
             name: body.name,
-            number: body.number
+            number: body.number,
+            id: generateId()
         })
 
         phonenumber.save().then(savedPhonenumber => {

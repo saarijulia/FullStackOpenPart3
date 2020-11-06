@@ -15,6 +15,7 @@ mongoose.connect(url, {useNewUrlParser: true, useUnifiedTopology: true, useFindA
     const phoneNumberSchema = new mongoose.Schema({
         name: String,
         number: String,
+        id: Number,
     })
 
     phoneNumberSchema.set('toJSON', {
