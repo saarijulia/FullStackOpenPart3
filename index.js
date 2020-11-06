@@ -1,3 +1,4 @@
+require('dotenv').config()
 const { request } = require('express')
 const express = require('express')
 const app = express()
@@ -10,6 +11,8 @@ app.use(express.static('build'))
 
 const cors = require('cors')
 app.use(cors())
+
+const Phonenumber = require('./models/phonenumber')
 
 let phonenumbers = [
     {
@@ -39,7 +42,12 @@ app.get('/', (request, response) => {
 })
 
 app.get('/api/persons', (request, response) => {
-    response.json(phonenumbers)
+    Phonenumber.find({}).then(result => {
+        result.forEach(phonenumber => {
+            console.log(phonenumber.name, ' ', phonenumber.number);
+        })
+        response.json(result)
+    })
 })
 
 app.get('/api/persons/:id', (request, response) => {
@@ -70,12 +78,12 @@ app.delete('/api/persons/:id', (request, response) => {
 app.post('/api/persons', (request, response) => {
     const body = request.body
 
-    const generateId = () => {
+    /*const generateId = () => {
         const maxId = phonenumbers.length > 0
             ? Math.max(...phonenumbers.map(n => n.id))
             : 0
         return maxId + 1
-    }
+    }*/
 
     if (!body.name || !body.number) {
         return response.status(400).json({
@@ -86,21 +94,19 @@ app.post('/api/persons', (request, response) => {
             error: 'person already exists in phonebook'
         })
     } else {
-
-        const person = {
-            id: generateId(),
+        const phonenumber = new Phonenumber({
             name: body.name,
             number: body.number
-        }
-        console.log(person);
-        phonenumbers = phonenumbers.concat(person)
-        response.json(person)
+        })
+
+        phonenumber.save().then(savedPhonenumber => {
+            response.json(savedPhonenumber)
+            console.log(savedPhonenumber);
+        })
     }
-
-
 })
 
-const PORT = process.env.PORT || 3001
+const PORT = process.env.PORT
 app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`)
+    console.log(`Server running on port ${PORT}`)
 })
