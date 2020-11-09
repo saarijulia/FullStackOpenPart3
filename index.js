@@ -74,13 +74,24 @@ app.delete('/api/persons/:id', (request, response, next) => {
         .then(phonenumber => {
             if (phonenumber) {
                 console.log('deleted', phonenumber);
-                
+
             } else {
                 response.status(204).end()
             }
         })
         .catch(error => next(error))
 })
+
+app.put('/api/persons/:id', (request, response) => {
+    const newNumber = request.body.number
+
+    Phonenumber.findByIdAndUpdate(request.params.id,  {$set: { number: newNumber }}, {new :true})
+    .then(newPhonenumber => {
+        response.json(newPhonenumber)
+        console.log(newPhonenumber);
+    })
+})
+
 
 app.post('/api/persons', (request, response) => {
     const body = request.body
