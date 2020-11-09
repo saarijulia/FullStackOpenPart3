@@ -14,6 +14,7 @@ app.use(cors())
 
 const Phonenumber = require('./models/phonenumber')
 
+
 let phonenumbers = [
     {
         id: 1,
@@ -50,7 +51,7 @@ app.get('/api/persons', (request, response) => {
     })
 })
 
-app.get('/api/persons/:id', (request, response) => {
+app.get('/api/persons/:id', (request, response, next) => {
     const id = Phonenumber.findById(request.params.id)
         .then(number => {
             if (number) {
@@ -68,11 +69,15 @@ app.get('/info', (request, response) => {
     response.send(`<p>Phonebook has info for ${numCount} people</p> <br/> ${Date()}`)
 })
 
-app.delete('/api/persons/:id', (request, response) => {
+app.delete('/api/persons/:id', (request, response, next) => {
     Phonenumber.findByIdAndRemove(request.params.id)
-        .then(result => {
-            console.log('deleted', request.params.id);
-            response.status(204).end()
+        .then(phonenumber => {
+            if (phonenumber) {
+                console.log('deleted', phonenumber);
+                
+            } else {
+                response.status(204).end()
+            }
         })
         .catch(error => next(error))
 })
@@ -108,6 +113,16 @@ app.post('/api/persons', (request, response) => {
         })
     }
 })
+
+const errorHandler = (error, request, response, next) => {
+    console.log(error.message);
+
+    if (error.name === 'CastError') {
+        return response.status(400).send({ error: 'malformatted id' })
+    }
+    next(error)
+}
+app.use(errorHandler)
 
 const PORT = process.env.PORT
 app.listen(PORT, () => {
