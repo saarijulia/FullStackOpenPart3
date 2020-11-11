@@ -1,4 +1,5 @@
 require('dotenv').config()
+// eslint-disable-next-line no-unused-vars
 const { request } = require('express')
 const express = require('express')
 const app = express()
@@ -18,23 +19,23 @@ const Phonenumber = require('./models/phonenumber')
 let phonenumbers = [
     {
         id: 1,
-        name: "Arto Hellas",
-        number: "040-123456"
+        name: 'Arto Hellas',
+        number: '040-123456'
     },
     {
         id: 2,
-        name: "Ada Lovelace",
-        number: "39-44-5323523"
+        name: 'Ada Lovelace',
+        number: '39-44-5323523'
     },
     {
         id: 3,
-        name: "Dan Abramov",
-        number: "12-43-234345"
+        name: 'Dan Abramov',
+        number: '12-43-234345'
     },
     {
         id: 4,
-        name: "Mary Poppendick",
-        number: "39-23-6423122"
+        name: 'Mary Poppendick',
+        number: '39-23-6423122'
     }
 ]
 
@@ -45,14 +46,14 @@ app.get('/', (request, response) => {
 app.get('/api/persons', (request, response) => {
     Phonenumber.find({}).then(result => {
         result.forEach(phonenumber => {
-            console.log(phonenumber.name, ' ', phonenumber.number);
+            console.log(phonenumber.name, ' ', phonenumber.number)
         })
         response.json(result)
     })
 })
 
 app.get('/api/persons/:id', (request, response, next) => {
-    const id = Phonenumber.findById(request.params.id)
+    Phonenumber.findById(request.params.id)
         .then(number => {
             if (number) {
                 response.json(number)
@@ -73,7 +74,7 @@ app.delete('/api/persons/:id', (request, response, next) => {
     Phonenumber.findByIdAndRemove(request.params.id)
         .then(phonenumber => {
             if (phonenumber) {
-                console.log('deleted', phonenumber);
+                console.log('deleted', phonenumber)
 
             } else {
                 response.status(204).end()
@@ -88,7 +89,7 @@ app.put('/api/persons/:id', (request, response) => {
     Phonenumber.findByIdAndUpdate(request.params.id, { $set: { number: newNumber } }, { new: true })
         .then(newPhonenumber => {
             response.json(newPhonenumber)
-            console.log(newPhonenumber);
+            console.log(newPhonenumber)
         })
 })
 
@@ -107,7 +108,7 @@ app.post('/api/persons', (request, response, next) => {
         return response.status(400).json({
             error: 'content missing'
         })
-    } else if (phonenumbers.some(person => person.name == body.name)) {
+    } else if (phonenumbers.some(person => person.name === body.name)) {
         return response.status(400).json({
             error: 'person already exists in phonebook'
         })
@@ -122,14 +123,14 @@ app.post('/api/persons', (request, response, next) => {
             .save()
             .then(savedPhonenumber => {
                 response.json(savedPhonenumber)
-                console.log(savedPhonenumber);
+                console.log(savedPhonenumber)
             })
             .catch(error => next(error))
     }
 })
 
 const errorHandler = (error, request, response, next) => {
-    console.error(error.message);
+    console.error(error.message)
 
     if (error.name === 'CastError') {
         return response.status(400).send({ error: 'malformatted id' })
@@ -140,6 +141,7 @@ const errorHandler = (error, request, response, next) => {
 }
 app.use(errorHandler)
 
+// eslint-disable-next-line no-undef
 const PORT = process.env.PORT
 app.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`)
