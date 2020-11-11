@@ -85,15 +85,15 @@ app.delete('/api/persons/:id', (request, response, next) => {
 app.put('/api/persons/:id', (request, response) => {
     const newNumber = request.body.number
 
-    Phonenumber.findByIdAndUpdate(request.params.id,  {$set: { number: newNumber }}, {new :true})
-    .then(newPhonenumber => {
-        response.json(newPhonenumber)
-        console.log(newPhonenumber);
-    })
+    Phonenumber.findByIdAndUpdate(request.params.id, { $set: { number: newNumber } }, { new: true })
+        .then(newPhonenumber => {
+            response.json(newPhonenumber)
+            console.log(newPhonenumber);
+        })
 })
 
 
-app.post('/api/persons', (request, response) => {
+app.post('/api/persons', (request, response, next) => {
     const body = request.body
 
     const generateId = () => {
@@ -118,18 +118,23 @@ app.post('/api/persons', (request, response) => {
             id: generateId()
         })
 
-        phonenumber.save().then(savedPhonenumber => {
-            response.json(savedPhonenumber)
-            console.log(savedPhonenumber);
-        })
+        phonenumber
+            .save()
+            .then(savedPhonenumber => {
+                response.json(savedPhonenumber)
+                console.log(savedPhonenumber);
+            })
+            .catch(error => next(error))
     }
 })
 
 const errorHandler = (error, request, response, next) => {
-    console.log(error.message);
+    console.error(error.message);
 
     if (error.name === 'CastError') {
         return response.status(400).send({ error: 'malformatted id' })
+    } else if (error.name === 'ValidationError') {
+        return response.status(400).send({ error: 'name must be unique' })
     }
     next(error)
 }
